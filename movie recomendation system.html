@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Recommendation System</title>
+  
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    padding-top: 40px;
+    background: url('https://images.unsplash.com/photo-1497032205916-ac775f0649ae') no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+  }
+
+  select, button {
+    font-size: 16px;
+    padding: 10px;
+    margin: 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: #ffffffcc;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #f0f0f0;
+  }
+
+  #results {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .movie {
+    background-color: #1e1e1ecc;
+    border-radius: 12px;
+    width: 250px;
+    padding: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    transform: perspective(1000px) rotateY(0deg);
+    transition: transform 0.5s, box-shadow 0.5s;
+    color: #fff;
+    backdrop-filter: blur(6px);
+  }
+
+  .movie:hover {
+    transform: perspective(1000px) rotateY(5deg) scale(1.03);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+  }
+
+  .movie img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  }
+
+  h3 {
+    font-size: 20px;
+    margin-top: 10px;
+  }
+</style>
+
+
+</head>
+<body>
+
+  <h1>🎬 Movie Recommendation System</h1>
+
+  <label for="genre">Choose a genre:</label>
+  <select id="genre">
+    <option value="action">Action</option>
+    <option value="comedy">Comedy</option>
+    <option value="drama">Drama</option>
+    <option value="sci-fi">Sci-Fi</option>
+  </select>
+
+  <button onclick="recommendMovies()">Get Recommendations</button>
+
+  <div id="results"></div>
+
+  <script>
+    const movieDatabase = {
+        action: [
+        { title: "Mad Max: Fury Road", poster: "https://image.tmdb.org/t/p/w500/8tZYtuWezp8JbcsvHYO0O46tFbo.jpg" },
+        { title: "John Wick", poster: "https://image.tmdb.org/t/p/w500/3LrN3z1W8StYVqfJyaYvLFapV4H.jpg" },
+        { title: "Avengers: Endgame", poster: "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg" },
+        { title: "Top Gun: Maverick", poster: "https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg" },
+        { title: "The Dark Knight", poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg" },
+        { title: "Gladiator", poster: "https://image.tmdb.org/t/p/w500/ty8TGRuvJLPUmAR1H1nRIsgwvim.jpg" },
+        { title: "Die Hard", poster: "https://image.tmdb.org/t/p/w500/A0xW7GgeFQoQvOnh3h9pM1tE4nG.jpg" },
+        { title: "Extraction", poster: "https://image.tmdb.org/t/p/w500/wlfDxbGEsW58vGhFljKkcR5IxDj.jpg" },
+        { title: "Skyfall", poster: "https://image.tmdb.org/t/p/w500/45Y1G5FEJNbDCO8UjZKSnQwjNzl.jpg" },
+        { title: "Casino Royale", poster: "https://image.tmdb.org/t/p/w500/4jjQnBx6nKWkM5WvUu7qqQ4Ej1E.jpg" },
+        { title: "The Bourne Ultimatum", poster: "https://image.tmdb.org/t/p/w500/3bXKjHAyaznWcDHKUibkMccsKj8.jpg" },
+        { title: "Terminator 2", poster: "https://image.tmdb.org/t/p/w500/weVXMD5QBGeQil4HEATZqAkXeEc.jpg" },
+        { title: "Rambo", poster: "https://image.tmdb.org/t/p/w500/2l05cFWJacyIsTpsqSgH0wQxe4V.jpg" },
+        { title: "Mission: Impossible", poster: "https://image.tmdb.org/t/p/w500/6Vtf0n2R5lmpnAJvkjFzO5GFPvS.jpg" },
+        { title: "The Equalizer", poster: "https://image.tmdb.org/t/p/w500/2eQZD740HzpK8mn3b4z7Yvfp9Pa.jpg" },
+      ],
+      comedy: [
+        { title: "Superbad", poster: "https://image.tmdb.org/t/p/w500/ek8e8txUyUwd2BNqj6lFEerJfbq.jpg" },
+        { title: "Step Brothers", poster: "https://image.tmdb.org/t/p/w500/dhN6J1WwRMLH7sq7FuE5ZCPY2Zo.jpg" },
+        { title: "The Hangover", poster: "https://image.tmdb.org/t/p/w500/kfX8Ctin3fSZbdnjh6CXSNZUOVP.jpg" },
+        { title: "Anchorman", poster: "https://image.tmdb.org/t/p/w500/cvdTnT5xNVzJcq0U2HzlOQGkkZx.jpg" },
+        { title: "Zombieland", poster: "https://image.tmdb.org/t/p/w500/dUkAmAyPVqubSBNRjRqCgHggZcK.jpg" },
+        { title: "Ted", poster: "https://image.tmdb.org/t/p/w500/bj9e82uR5h1zkGFbW6fXb0vZlAK.jpg" },
+        { title: "The Mask", poster: "https://image.tmdb.org/t/p/w500/avTA4WQ7khB1dcuUUcU8nBYe6Iq.jpg" },
+        { title: "21 Jump Street", poster: "https://image.tmdb.org/t/p/w500/8v3SqvUq4Le36fKZpzV9wl5p20e.jpg" },
+        { title: "22 Jump Street", poster: "https://image.tmdb.org/t/p/w500/c5ULGzVRiKkGXDxzFG7PZFwaKmS.jpg" },
+        { title: "Game Night", poster: "https://image.tmdb.org/t/p/w500/2bXy9vZ7gcBzGGZ5H03YuT1GpeU.jpg" },
+        { title: "The Internship", poster: "https://image.tmdb.org/t/p/w500/dSND3MKHKCjJzIKzU1Y43Lw1AnR.jpg" },
+        { title: "We're the Millers", poster: "https://image.tmdb.org/t/p/w500/fGwDW9KxO6cM7MJu2f3V3k5n2iX.jpg" },
+        { title: "Dumb and Dumber", poster: "https://image.tmdb.org/t/p/w500/fec9HLvYzk3oB2BzvVR7fs1lE8v.jpg" },
+        { title: "Liar Liar", poster: "https://image.tmdb.org/t/p/w500/kJqpEwFdowFeLh4qUhTF9YrKVSz.jpg" },
+        { title: "Bruce Almighty", poster: "https://image.tmdb.org/t/p/w500/hvM3zAm8rwRGmZEKtBSn2D7s4Nw.jpg" }
+      ],
+      drama: [
+        { title: "The Shawshank Redemption", poster: "https://m.media-amazon.com/images/I/51NiGlapXlL._AC_.jpg" },
+        { title: "Forrest Gump", poster: "https://m.media-amazon.com/images/I/61hFQULvK8L._AC_SY679_.jpg" },
+        { title: "Fight Club", poster: "https://m.media-amazon.com/images/I/71Db5dF8fQL._AC_SY679_.jpg" },
+        { title: "The Godfather", poster: "https://m.media-amazon.com/images/I/41--5wVOSLL._AC_.jpg" },
+        { title: "12 Years a Slave", poster: "https://m.media-amazon.com/images/I/51XlC7uKYUL._AC_.jpg" },
+        { title: "The Pursuit of Happyness", poster: "https://m.media-amazon.com/images/I/81I+iqG-2ML._AC_SY679_.jpg" },
+        { title: "A Beautiful Mind", poster: "https://m.media-amazon.com/images/I/81WGHbQ8mZL._AC_SY679_.jpg" },
+        { title: "The Green Mile", poster: "https://m.media-amazon.com/images/I/71QWlH9tzrL._AC_SY679_.jpg" }
+      ],
+      "sci-fi": [
+        { title: "Inception", poster: "https://m.media-amazon.com/images/I/51NbVEuw1HL._AC_.jpg" },
+        { title: "The Matrix", poster: "https://m.media-amazon.com/images/I/51EG732BV3L._AC_.jpg" },
+        { title: "Interstellar", poster: "https://m.media-amazon.com/images/I/91cdkZ0P38L._AC_SY679_.jpg" },
+        { title: "Blade Runner 2049", poster: "https://m.media-amazon.com/images/I/61BvxYkvonL._AC_SY679_.jpg" },
+        { title: "Arrival", poster: "https://m.media-amazon.com/images/I/81WwGUsnDUL._AC_SY679_.jpg" },
+        { title: "The Martian", poster: "https://m.media-amazon.com/images/I/91l2nmb2ZWL._AC_SY679_.jpg" },
+        { title: "Ex Machina", poster: "https://m.media-amazon.com/images/I/71f6C5H3vhL._AC_SY679_.jpg" },
+        { title: "Ready Player One", poster: "https://m.media-amazon.com/images/I/81yH44+7eTL._AC_SY679_.jpg" }
+      ]
+    };
+  
+    function getRandomMovies(arr, count = 5) {
+      const shuffled = arr.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+  
+    function recommendMovies() {
+      const genre = document.getElementById("genre").value;
+      const movies = movieDatabase[genre];
+      const recommendations = getRandomMovies(movies);
+  
+      const resultDiv = document.getElementById("results");
+      resultDiv.innerHTML = "<h2>Recommended Movies:</h2>";
+  
+      recommendations.forEach(movie => {
+        resultDiv.innerHTML += `
+          <div class="movie">
+            <img src="${movie.poster}" alt="${movie.title}">
+            <h3>${movie.title}</h3>
+          </div>
+        `;
+      });
+    }
+  </script>
+  
+
+</body>
+</html>
